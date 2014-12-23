@@ -317,7 +317,6 @@ var parseGIF = function (st, handler) {
 			parseUnknownExt(block);
 			break;
 		}
-		console.log(block.extType);
 	};
 
 	var parseImg = function (img) {
@@ -459,7 +458,6 @@ var SuperGif = function ( opts ) {
 	var doParse = function () {
 		try {
 			parseGIF(stream, handler);
-			console.log("parse done");
 		}
 		catch (err) {
 			doLoadError('parse');
