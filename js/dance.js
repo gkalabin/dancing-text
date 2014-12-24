@@ -1,12 +1,24 @@
 function displayImage(img, setEditorContentFxn) {
   var displayFrame = function(frame) {
+    var editorHeight = Math.floor(aceEditor.container.clientHeight / aceEditor.renderer.layerConfig.lineHeight) - 2;
+    var scale = editorHeight / frame.height;
+
+    var destCtx = $("<canvas>").appendTo($("body"))[0].getContext("2d");
+    var newCanvas = $("<canvas>")
+        .attr("width", frame.width)
+        .attr("height", frame.height)[0];
+    newCanvas.getContext("2d").putImageData(frame, 0, 0);
+    destCtx.scale(scale, scale);
+    destCtx.drawImage(newCanvas, 0, 0);
+    var scaledFrame = destCtx.getImageData(0, 0, frame.width * scale, frame.height * scale);
+    
     var image = "";
-    for (var y = 0; y < frame.height; y++) {
-      for(var x = 0; x < frame.width; x++) {
-        var pixelBytesStart = y * frame.width * 4 + x * 4;
-        var r = frame.data[pixelBytesStart + 0];
-        var g = frame.data[pixelBytesStart + 1];
-        var b = frame.data[pixelBytesStart + 2];
+    for (var line = 0; line < scaledFrame.height; line++) {
+      for(var column = 0; column < scaledFrame.width; column++) {
+        var pixelBytesStart = line * scaledFrame.width * 4 + column * 4;
+        var r = scaledFrame.data[pixelBytesStart + 0];
+        var g = scaledFrame.data[pixelBytesStart + 1];
+        var b = scaledFrame.data[pixelBytesStart + 2];
         image += getColor((r + g + b) / 3);
       }
       image += "\n";
