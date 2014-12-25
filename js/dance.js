@@ -2,16 +2,12 @@ function displayImage(img, setEditorContentFxn) {
   var displayFrame = function(frame) {
     var editorHeight = Math.floor(aceEditor.container.clientHeight / aceEditor.renderer.layerConfig.lineHeight) - 2;
     var scale = editorHeight / frame.height;
+    var scaledCtx = $("<canvas>")[0].getContext("2d");
+    var tmpImageHolder = $("<canvas>").attr("width", frame.width).attr("height", frame.height)[0];
+    tmpImageHolder.getContext("2d").putImageData(frame, 0, 0);
+    scaledCtx.drawImage(tmpImageHolder, 0, 0, frame.width * scale, frame.height * scale);
+    var scaledFrame = scaledCtx.getImageData(0, 0, frame.width * scale, frame.height * scale);
 
-    var destCtx = $("<canvas>").appendTo($("body"))[0].getContext("2d");
-    var newCanvas = $("<canvas>")
-        .attr("width", frame.width)
-        .attr("height", frame.height)[0];
-    newCanvas.getContext("2d").putImageData(frame, 0, 0);
-    destCtx.scale(scale, scale);
-    destCtx.drawImage(newCanvas, 0, 0);
-    var scaledFrame = destCtx.getImageData(0, 0, frame.width * scale, frame.height * scale);
-    
     var image = "";
     for (var line = 0; line < scaledFrame.height; line++) {
       for(var column = 0; column < scaledFrame.width; column++) {
@@ -28,7 +24,7 @@ function displayImage(img, setEditorContentFxn) {
   
   var animate = function(frames) {
     var step = function(idx) {
-      idx = idx < frames.length ? idx : -1;
+      idx = idx < frames.length ? idx : 0;
       if (idx < 0) {
         return;
       }
@@ -47,12 +43,7 @@ function displayImage(img, setEditorContentFxn) {
 }
 
 function getColor(pixel) {
-  var color = pixel > 128 ? 1 : 0;
-  if (color === 1 || color === 0) {
-    return color == 1 ? "." : "#";
-  }
-  console.error("Got bad color: " + color);
-  return 1;
+  return pixel < 170 ? "#" : ".";
 }
 
 var aceEditor = ace.edit("editor");
